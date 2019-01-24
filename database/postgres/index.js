@@ -1,52 +1,66 @@
 const { Pool, Client } = require('pg');
-// const { Review } = require('./schema_postgres.js')
+const config = require('./config.js');
 
-// mongoose.connect('mongodb://127.0.0.1:27017/test', { useNewUrlParser: true })
-//   .then(() => {
-//   })
-//   .catch(err => { // mongoose connection error will be handled here
-//       console.error('App starting error:', err.stack);
-//       process.exit(1);
-//    });
+const pool = new Pool(config);
 
-const pool = new Pool({
-  user: 'root',
-  host: 'localhost',
-  database: 'reviews',
-  password: 'admin',
-  port: 5432,
+pool.on('error', (err) => {
+  console.log('Error', err);
 })
 
-pool.query('SELECT NOW()', (err, res) => {
-  console.log(err, res)
-  pool.end()
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('Error acquiring client', err.stack)
+  } else {
+    console.log('connected to postgres');
+  }
 })
 
-const client = new Client({
-  user: 'root',
-  host: 'localhost',
-  database: 'reviews',
-  password: 'admin',
-  port: 5432,
-})
-client.connect()
 
-client.query('SELECT NOW()', (err, res) => {
-  console.log(err, res)
-  client.end()
-})
+// ----- Database Functions ----- //
 
-// var db = mongoose.connection;
+// CREATE
+const addReview = (w_id, callback) => {
+  const queryString = `insert into reviews(w_id, reviewer, stars, date_posted, review_header, review_body, upvotes, downvotes)`;
+  pool.query(queryString, (err, results) => {
+    if (err) {
+      callback(error);
+    } else {
+      callback(results);
+    }
+  })
+}
 
-//Bind connection to error event (to get notification of connection errors)
-// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-const getReviewsForId = (id, cb) => {
-  Review.find({ w_id: id }, (err, document) => {
-    if (err) { throw err; }
-    cb(document);
+// READ
+const getReviewsById = (w_id, callback) => {
+  const queryString = `select * from reviews where w_id = ${w_id}`;
+  pool.query(queryString, (err, results) => {
+    if (err) {
+      callback(error);
+    } else {
+      const data = results.rows;
+      callback(data);
+    }
   });
 };
 
-module.exports.getReviewsForId = getReviewsForId;
-module.exports.database = db;
+// UPDATE
+
+// DELETE
+const deleteReview = (w_id, callback) => {
+  const queryString = `delete from photos where id = ${w_id}`;
+  pool.query(queryString, (err) => {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null);
+    }
+  });
+};
+
+module.exports = {
+  addReview,
+  getReviewsById,
+  // editReview,
+  deleteReview
+}

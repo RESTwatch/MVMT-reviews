@@ -4,10 +4,9 @@
 
 ## Related Projects
 
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
+  - https://github.com/SDC-Group-2/MVMT-summary
+  - https://github.com/SDC-Group-2/MVMT-details-specs
+  - https://github.com/SDC-Group-2/MVMT-product-photos
 
 ## Table of Contents
 
@@ -17,13 +16,17 @@
 
 ## Usage
 
-To start the app:
-  npm install
-  
-  mongod
+Generate fake data:
+```sh
+npm run generate
+```
+
+Start app:
+```sh
   npm run build
-  npm run seed-dev
-  npm run start-dev
+  npm run seed-pg
+  npm run start-pg
+ ```
 
 ## Requirements
 
